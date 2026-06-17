@@ -3,7 +3,7 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 
 
 export default function Dashboard() {
-  const [jobs] = useState([]);
+  const [jobs, setJobs] = useState([]);
   const navigate = useNavigate();
   const { user, isFreelancer } = useOutletContext();
 
@@ -13,7 +13,7 @@ export default function Dashboard() {
 
       {/* Acao exclusiva do contratante para cadastrar uma nova vaga. */}
       {!isFreelancer && (
-        <div className="bg-[#f4f4f8] p-4 rounded-xl shadow mb-6">
+        <div className="bg-white p-4 rounded-xl shadow mb-6">
           <button
           
             type="button"
@@ -27,7 +27,7 @@ export default function Dashboard() {
       )}
 
       {/* Barra de busca e filtro para procurar vagas dentro da dashboard. */}
-      <div className="bg-[#f4f4f8] p-4 rounded-xl shadow mb-6 flex gap-4">
+      <div className="bg-white p-4 rounded-xl shadow mb-6 flex gap-4">
         <input
           placeholder="Buscar vagas..."
           className="flex-1 border p-2 rounded focus:outline-none "
@@ -42,7 +42,7 @@ export default function Dashboard() {
       </div>
 
       {/* Secao que lista vagas disponiveis para freelancer ou vagas do contratante. */}
-      <div className="bg-[#f4f4f8] p-4 rounded-xl shadow">
+      <div className="bg-white p-4 rounded-xl shadow">
         <h2 className="font-semibold mb-4">
           Vagas disponíveis
         </h2>

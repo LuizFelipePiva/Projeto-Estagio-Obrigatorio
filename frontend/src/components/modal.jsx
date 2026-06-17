@@ -1,4 +1,9 @@
-export default function Modal({ isOpen, onClose, children }) {
+export default function Modal({
+  isOpen,
+  onClose,
+  children,
+  contentClassName = "max-w-md",
+}) {
   if (!isOpen) return null;
 
   return (
@@ -9,7 +14,7 @@ export default function Modal({ isOpen, onClose, children }) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6"
+        className={`bg-white rounded-2xl shadow-xl w-full p-6 ${contentClassName}`}
         onClick={(event) => event.stopPropagation()}
       >
         {children}

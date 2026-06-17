@@ -5,12 +5,29 @@ import api from "../services/api";
 
 // importacao de componentes
 import DeleteJobModal from "../components/DeleteJobModal";
+import EditJobModal from "../components/EditJobModal";
+
+const formatDisplayDate = (date) => {
+    if (!date) return "";
+
+    const [year, month, day] = String(date).split("T")[0].split("-");
+
+    if (year && month && day) {
+        return `${day}/${month}/${year}`;
+    }
+
+    return new Date(date).toLocaleDateString("pt-BR");
+};
 
 export default function Jobs() {
     const [jobs, setJobs] = useState([]);
+
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [selectedJob, setSelectedJob] = useState(null);
+
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
         const getMyJobs = async () => {
@@ -36,13 +53,23 @@ export default function Jobs() {
         setSelectedJob(null);
     };
 
+    const openEditModal = (job) => {
+        setSelectedJob(job);
+        setShowEditModal(true);
+    };
+
+    const closeEditModal = () => {
+        setShowEditModal(false);
+        setSelectedJob(null);
+    };
+
     const handleDelete = async () => {
         if (!selectedJob) return;
 
         try {
             setIsDeleting(true);
             await api.delete(`/jobs/${selectedJob.idvagas}`);
-            
+
             setJobs((prev) =>
                 prev.filter((job) => job.idvagas !== selectedJob.idvagas)
             );
@@ -52,6 +79,29 @@ export default function Jobs() {
             console.error(error);
         } finally {
             setIsDeleting(false);
+        }
+    };
+
+    const handleEdit = async (formData) => {
+        if (!selectedJob) return;
+
+        try {
+            setIsEditing(true);
+            await api.put(`/jobs/${selectedJob.idvagas}`, { formData });
+
+            setJobs((prev) =>
+                prev.map((job) =>
+                    job.idvagas === selectedJob.idvagas
+                        ? { ...job, ...formData }
+                        : job
+                )
+            );
+
+            closeEditModal();
+        } catch (error) {
+            console.error("Erro ao editar vaga:", error);
+        } finally {
+            setIsEditing(false);
         }
     };
 
@@ -96,15 +146,14 @@ export default function Jobs() {
 
                             <div className="flex justify-between">
                                 <span className="text-gray-500">Prazo de Inscrição </span>
-                                <span>
-                                    {new Date(job.data_final).toLocaleDateString("pt-BR")}
-                                </span>
+                                <span>{formatDisplayDate(job.data_final)}</span>
                             </div>
                         </div>
 
                         <div className="mt-5 flex gap-2">
                             <button
                                 className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+                                onClick={() => openEditModal(job)}
                             >
                                 Editar
                             </button>
@@ -126,6 +175,14 @@ export default function Jobs() {
                 onClose={closeDeleteModal}
                 onConfirm={handleDelete}
                 isDeleting={isDeleting}
+            />
+
+            <EditJobModal
+                isOpen={showEditModal}
+                job={selectedJob}
+                onClose={closeEditModal}
+                onSubmit={handleEdit}
+                isSubmitting={isEditing}
             />
         </>
     );
