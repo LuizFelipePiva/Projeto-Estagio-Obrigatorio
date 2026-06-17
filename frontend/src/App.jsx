@@ -1,9 +1,18 @@
+
+
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+// Page imports
+
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Register from "./pages/Register";
+import Curriculum from "./pages/Curriculum";
+
+// Component imports
 
 import Notification from "./components/notification";
+import PrivateLayout from "./components/PrivateLayout";
 
 function PublicRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -58,13 +67,15 @@ function App() {
           />
           <Route path="/Register" element={<Navigate to="/register" replace />} />
           <Route
-            path="/dashboard"
             element={
               <PrivateRoute>
-                <Dashboard />
+                <PrivateLayout />
               </PrivateRoute>
             }
-          />
+          >
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/curriculum" element={<Curriculum />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </div>
