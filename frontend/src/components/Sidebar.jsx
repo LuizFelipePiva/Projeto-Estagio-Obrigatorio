@@ -1,4 +1,5 @@
-import { LogOut } from "lucide-react";
+import { LogOut, ChevronDown, ChevronUp } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaHome, FaFileAlt, FaClipboardList } from "react-icons/fa";
 import logo from "../assets/logo.png";
@@ -10,8 +11,11 @@ const menuButtonClass = (active) =>
   }`;
 
 export default function Sidebar({ user, isFreelancer, onLogout }) {
+
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [jobsOpen, setJobsOpen] = useState(false);
 
   const isActive = (path) =>
     location.pathname === path || location.pathname.startsWith(`${path}/`);
@@ -57,11 +61,37 @@ export default function Sidebar({ user, isFreelancer, onLogout }) {
           ) : (
             <button
               type="button"
-              onClick={() => navigate("/jobs")}
-              className={menuButtonClass(isActive("/jobs"))}
+              onClick={() => setJobsOpen(!jobsOpen)}
+              className={`${menuButtonClass(isActive("/jobs"))} flex items-center justify-between`}
             >
-              Minhas vagas
+              <span>Vagas</span>
+
+              {jobsOpen ? (
+                <ChevronUp size={18} />
+              ) : (
+                <ChevronDown size={18} />
+              )}
             </button>
+
+          )}
+          {jobsOpen && (
+            <div className="ml-6 mt-2 flex flex-col gap-2">
+
+              <button
+                onClick={() => navigate("/jobs")}
+                className={"w-full text-left p-2 rounded hover:bg-gray-200 text-white hover:text-black"}
+              >
+                Minhas vagas
+              </button>
+
+              <button
+                onClick={() => navigate("/jobs/create")}
+                className={"w-full text-left p-2 rounded hover:bg-gray-200 text-white hover:text-black"}
+              >
+                Nova vaga
+              </button>
+
+            </div>
           )}
         </div>
       </div>

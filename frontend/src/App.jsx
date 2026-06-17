@@ -8,6 +8,9 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Register from "./pages/Register";
 import Curriculum from "./pages/Curriculum";
+import Applications from "./pages/Applications";
+import Jobs from "./pages/Jobs";
+import CreateJob from "./pages/CreateJob";
 
 // Component imports
 
@@ -75,6 +78,9 @@ function App() {
           >
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/curriculum" element={<Curriculum />} />
+            <Route path="/applications" element={<Applications />} />
+            <Route path="/jobs" element={<Jobs />} />
+            <Route path="/jobs/create" element={<CreateJob />} />
           </Route>
         </Routes>
       </BrowserRouter>

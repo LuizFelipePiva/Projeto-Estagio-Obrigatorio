@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 
 import auth from './routes/auth.js';
+import jobs from './routes/jobs.js';
 
 dotenv.config();
 
@@ -15,6 +16,8 @@ app.get('/', (req, res) => {
 });
 
 app.use("/auth", auth);
+app.use("/jobs", jobs);
+
 
 app.listen(process.env.PORT, () => {
   console.log(`Servidor rodando na porta ${process.env.PORT}`);

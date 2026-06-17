@@ -5,7 +5,7 @@ export default function Topbar({ user, onLogout }) {
         <header className="h-20 bg-white flex justify-end items-center px-6 relative border-b border-gray-200 shadow-md">
             
             <div className="flex items-center gap-4">
-
+        
                 <div className="text-right">
                     <p className="font-semibold text-black">
                         {user.name}
