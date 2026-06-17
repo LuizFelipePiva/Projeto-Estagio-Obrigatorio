@@ -2,7 +2,7 @@ import { LogOut } from "lucide-react";
 
 export default function Topbar({ user, onLogout }) {
     return (
-        <header className="h-20 bg-white flex justify-end items-center px-6 relative">
+        <header className="h-20 bg-white flex justify-end items-center px-6 relative border-b border-gray-200 shadow-md">
             
             <div className="flex items-center gap-4">
 
