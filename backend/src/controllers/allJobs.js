@@ -3,7 +3,7 @@ import db from "../config/db.js";
 export const allJobs = async (req, res) => {
     try {
          const [jobs] = await db.query(
-            `SELECT idvagas,
+            `SELECT id_vagas,
             title,
             category,
             modality,

@@ -1,39 +1,75 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 
+import api from "../services/api";
+import ApplyJobModal from "../components/ApplyJobModal";
+import JobCard from "../components/JobCard";
 
 export default function Dashboard() {
   const [jobs, setJobs] = useState([]);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [showApplyModal, setShowApplyModal] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
   const navigate = useNavigate();
-  const { user, isFreelancer } = useOutletContext();
+  const { isFreelancer } = useOutletContext();
+
+  useEffect(() => {
+    const loadJobs = async () => {
+      try {
+        const endpoint = isFreelancer ? "/jobs/allJobs" : "/jobs/myJobs";
+        const response = await api.get(endpoint);
+        setJobs(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar vagas:", error);
+      }
+    };
+
+    loadJobs();
+  }, [isFreelancer]);
+
+  const openApplyModal = (job) => {
+    setSelectedJob(job);
+    setShowApplyModal(true);
+  };
+
+  const closeApplyModal = () => {
+    setShowApplyModal(false);
+    setSelectedJob(null);
+  };
+
+  const handleApply = async () => {
+    if (!selectedJob) return;
+
+    try {
+      setIsApplying(true);
+      console.log("Aplicar vaga:", selectedJob);
+      closeApplyModal();
+    } finally {
+      setIsApplying(false);
+    }
+  };
 
   return (
-    <div className="space-y-6">
-            
-
-      {/* Acao exclusiva do contratante para cadastrar uma nova vaga. */}
+    <>
+      <div className="space-y-6">
       {!isFreelancer && (
         <div className="bg-white p-4 rounded-xl shadow mb-6">
           <button
-          
             type="button"
             onClick={() => navigate("/jobs/create")}
             className="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700 transition"
           >
-            
             + Cadastrar vaga
           </button>
         </div>
       )}
 
-      {/* Barra de busca e filtro para procurar vagas dentro da dashboard. */}
       <div className="bg-white p-4 rounded-xl shadow mb-6 flex gap-4">
         <input
           placeholder="Buscar vagas..."
-          className="flex-1 border p-2 rounded focus:outline-none "
+          className="flex-1 border p-2 rounded focus:outline-none"
         />
         <button
-        
           type="button"
           className="bg-gray-200 px-4 rounded hover:bg-gray-300"
         >
@@ -41,48 +77,33 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {/* Secao que lista vagas disponiveis para freelancer ou vagas do contratante. */}
       <div className="bg-white p-4 rounded-xl shadow">
-        <h2 className="font-semibold mb-4">
-          Vagas disponíveis
-        </h2>
+        <h2 className="font-semibold mb-4">Vagas disponíveis</h2>
 
-        {/* Mensagem exibida quando ainda nao existem vagas carregadas. */}
         {jobs.length === 0 ? (
-          <p className="text-gray-500">
-            Nenhuma vaga encontrada
-          </p>
+          <p className="text-gray-500">Nenhuma vaga encontrada</p>
         ) : (
-          <div className="space-y-3">
-            {/* Cada card representa uma vaga com titulo, descricao e acao. */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {jobs.map((job) => (
-              <div
-                key={job.id}
-                className="border p-4 rounded flex justify-between items-center"
-              >
-                <div>
-                  <h3 className="font-semibold">
-                    {job.title}
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {job.description}
-                  </p>
-                </div>
-
-                {/* Botao mostrado apenas para freelancer se candidatar a vaga. */}
-                {isFreelancer && (
-                  <button
-                    type="button"
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-                  >
-                    Aplicar
-                  </button>
-                )}
-              </div>
+              <JobCard
+                key={job.idvagas}
+                job={job}
+                onAction={isFreelancer ? openApplyModal : undefined}
+                actionLabel="Aplicar"
+              />
             ))}
           </div>
         )}
       </div>
-    </div>
+      </div>
+
+      <ApplyJobModal
+        isOpen={showApplyModal}
+        job={selectedJob}
+        onClose={closeApplyModal}
+        onConfirm={handleApply}
+        isApplying={isApplying}
+      />
+    </>
   );
 }
