@@ -4,6 +4,7 @@ import cors from 'cors';
 
 import auth from './routes/auth.js';
 import jobs from './routes/jobs.js';
+import profile from './routes/profile.js';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.get('/', (req, res) => {
 
 app.use("/auth", auth);
 app.use("/jobs", jobs);
+app.use("/profile", profile);
 
 
 app.listen(process.env.PORT, () => {

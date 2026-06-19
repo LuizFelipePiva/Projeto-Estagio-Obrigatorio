@@ -51,9 +51,9 @@ export default function Jobs() {
 
     try {
       setIsDeleting(true);
-      await api.delete(`/jobs/${selectedJob.idvagas}`);
+      await api.delete(`/jobs/${selectedJob.id_vagas}`);
       setJobs((prev) =>
-        prev.filter((job) => job.idvagas !== selectedJob.idvagas)
+        prev.filter((job) => job.id_vagas !== selectedJob.id_vagas)
       );
       closeDeleteModal();
     } catch (error) {
@@ -68,10 +68,10 @@ export default function Jobs() {
 
     try {
       setIsEditing(true);
-      await api.put(`/jobs/${selectedJob.idvagas}`, { formData });
+      await api.put(`/jobs/${selectedJob.id_vagas}`, { formData });
       setJobs((prev) =>
         prev.map((job) =>
-          job.idvagas === selectedJob.idvagas ? { ...job, ...formData } : job
+          job.id_vagas === selectedJob.id_vagas ? { ...job, ...formData } : job
         )
       );
       closeEditModal();
@@ -87,7 +87,7 @@ export default function Jobs() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {jobs.map((job) => (
           <JobCard
-            key={job.idvagas}
+            key={job.id_vagas}
             job={job}
             onEdit={openEditModal}
             onDelete={openDeleteModal}

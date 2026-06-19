@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import api from "../services/api";
 import ApplyJobModal from "../components/ApplyJobModal";
@@ -40,9 +41,17 @@ export default function Dashboard() {
   const handleApply = async () => {
     if (!selectedJob) return;
 
+
     try {
       setIsApplying(true);
       console.log("Aplicar vaga:", selectedJob);
+
+      const response = await api.post(`/jobs/${selectedJob.id_vagas}/apply`);
+
+      toast.success(response.data?.message || "Candidatura realizada com sucesso");
+      closeApplyModal();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Erro ao se candidatar para a vaga");
       closeApplyModal();
     } finally {
       setIsApplying(false);
@@ -86,7 +95,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {jobs.map((job) => (
               <JobCard
-                key={job.idvagas}
+                key={job.id_vagas}
                 job={job}
                 onAction={isFreelancer ? openApplyModal : undefined}
                 actionLabel="Aplicar"

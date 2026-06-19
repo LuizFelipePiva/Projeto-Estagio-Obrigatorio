@@ -1,7 +1,7 @@
 import db from "../config/db.js";
 
 export const editJob = async (req, res) => {
-    const { idvagas } = req.params;
+    const { id_vagas } = req.params;
     const userId = req.user.id;
     const formData = req.body?.formData ?? {};
 
@@ -27,7 +27,7 @@ export const editJob = async (req, res) => {
                  description = ?,
                  requirements = ?,
                  data_final = ?
-             WHERE idvagas = ? AND id_user = ?`,
+             WHERE id_vagas = ? AND id_user = ?`,
             [
                 title,
                 category,
@@ -37,7 +37,7 @@ export const editJob = async (req, res) => {
                 description,
                 requirements,
                 data_final,
-                idvagas,
+                id_vagas,
                 userId,
             ]
         );

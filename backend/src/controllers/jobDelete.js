@@ -1,12 +1,12 @@
 import db from "../config/db.js";
 
 export const deleteJob = async (req, res) => {
-  const { idvagas } = req.params;
+  const { id_vagas } = req.params;
 
   try {
     const [result] = await db.query(
-      "DELETE FROM vagas WHERE idvagas = ? AND id_user = ?",
-      [idvagas, req.user.id]
+      "DELETE FROM vagas WHERE id_vagas = ? AND id_user = ?",
+      [id_vagas, req.user.id]
     );
 
     if (result.affectedRows === 0) {
