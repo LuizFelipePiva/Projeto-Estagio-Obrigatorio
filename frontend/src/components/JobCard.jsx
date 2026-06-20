@@ -34,7 +34,7 @@ export default function JobCard({
 
   else if (job.flag_pendencia === "Recusado") {
     //nome_pendencia = "Recusado";
-    classe_flag_pendencia = "bg-red-50";
+    classe_flag_pendencia = "bg-red-100";
 
   }
 
