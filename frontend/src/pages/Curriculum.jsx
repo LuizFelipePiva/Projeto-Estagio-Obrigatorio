@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import { toast } from "react-toastify";
 
+import { useNavigate } from "react-router-dom";
+
+import { PatternFormat } from "react-number-format";
+
 import api from "../services/api";
 
 const emptyProfile = {
@@ -16,6 +20,7 @@ export default function Curriculum() {
   const [formData, setFormData] = useState(emptyProfile);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -53,13 +58,21 @@ export default function Curriculum() {
     event.preventDefault();
 
     try {
+
       setIsSubmitting(true);
       const response = await api.put("/profile/freelancer", formData);
       toast.success(response.data?.message || "Curriculo salvo com sucesso");
+      navigate("/dashboard");
+
     } catch (error) {
+
       toast.error(error.response?.data?.message || "Erro ao salvar curriculo");
+      navigate("/dashboard");
+
     } finally {
+
       setIsSubmitting(false);
+
     }
   };
 
@@ -133,14 +146,18 @@ export default function Curriculum() {
           <label className="block mb-2 font-medium text-gray-700">
             Telefone para contato
           </label>
-          <input
-            required
-            type="tel"
-            name="telefone"
+
+          <PatternFormat
+            format="(##) #####-####"
             value={formData.telefone}
-            onChange={handleChange}
-            placeholder="Ex: (11) 99999-9999"
+            onValueChange={(values) =>
+              setFormData((prev) => ({
+                ...prev,
+                telefone: values.formattedValue,
+              }))
+            }
             className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="(99) 99999-9999"
           />
         </div>
 

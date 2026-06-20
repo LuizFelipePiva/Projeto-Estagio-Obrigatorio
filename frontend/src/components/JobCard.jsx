@@ -17,16 +17,44 @@ export default function JobCard({
   onAction,
   actionLabel = "Aplicar",
 }) {
+
+  //var nome_pendencia = "";
+  var classe_flag_pendencia = "";
+
+  if (job.flag_pendencia === "Pendente") {
+    //nome_pendencia = "Pendente";
+    classe_flag_pendencia = "bg-yellow-50";
+  }
+
+  else if (job.flag_pendencia === "Aprovado") {
+    //nome_pendencia = "Aprovado";
+    classe_flag_pendencia = "bg-green-50";
+
+  }
+
+  else if (job.flag_pendencia === "Recusado") {
+    //nome_pendencia = "Recusado";
+    classe_flag_pendencia = "bg-red-50";
+
+  }
+
   return (
-    <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-5 hover:shadow-lg transition">
+    <div className={`bg-white rounded-2xl shadow-md border border-gray-200 p-5 hover:shadow-lg transition ${classe_flag_pendencia}`}>
       <div className="flex justify-between items-start gap-3 mb-3">
         <h3 className="text-lg font-semibold text-gray-800">{job.title}</h3>
 
-        {job.modality && (
-          <span className="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full shrink-0">
-            {job.modality}
-          </span>
-        )}
+        <div className="flex gap-2">
+          {job.modality && (
+            <span className="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full shrink-0 items-end">
+              {job.modality}
+            </span>
+          )}
+          {job.flag_pendencia && (
+            <span className={`text-xs px-3 py-1 rounded-full shrink-0 items-end ${classe_flag_pendencia}`} >
+              {job.flag_pendencia}
+            </span>
+          )}
+        </div>
       </div>
 
       {job.category && (
@@ -47,12 +75,14 @@ export default function JobCard({
           <span className="text-gray-500">Local</span>
           <span className="text-right">{job.location}</span>
         </div>
-
-        <div className="flex justify-between gap-3">
-          <span className="text-gray-500">Prazo de Inscrição</span>
-          <span className="text-right">{formatDisplayDate(job.data_final)}</span>
-        </div>
+        {(job.data_final) &&
+          <div className="flex justify-between gap-3">
+            <span className="text-gray-500">Prazo de Inscrição</span>
+            <span className="text-right">{formatDisplayDate(job.data_final)}</span>
+          </div>
+        }
       </div>
+
 
       {(onEdit || onDelete || onAction) && (
         <div className="mt-5 flex gap-2">

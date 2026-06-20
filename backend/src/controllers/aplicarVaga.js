@@ -6,7 +6,7 @@ export const applyForJob = async (req, res) => {
 
     try {
         // Verificar se o candidato já se inscreveu para a vaga
-        const checkQuery = "SELECT * FROM vagas_aplicadas WHERE id_user = ? AND id_vagas = ?";
+        const checkQuery = "SELECT * FROM vagas_aplicadas WHERE id_user_vagas_aplicadas = ? AND id_vagas = ?";
         const [existingApplication] = await db.query(checkQuery, [id_user, id_vagas]);
         if (existingApplication.length > 0) {
             return res.status(400).json({ message: "Você já se inscreveu para esta vaga." });
@@ -14,7 +14,7 @@ export const applyForJob = async (req, res) => {
 
         // Inserir a candidatura no banco de dados
         const insertQuery = `
-            INSERT INTO vagas_aplicadas (idvagas_aplicadas, id_user, id_vagas, flag_pendencia)
+            INSERT INTO vagas_aplicadas (idvagas_aplicadas, id_user_vagas_aplicadas, id_vagas, flag_pendencia)
             SELECT COALESCE(MAX(idvagas_aplicadas), 0) + 1, ?, ?, 1
             FROM vagas_aplicadas
         `;

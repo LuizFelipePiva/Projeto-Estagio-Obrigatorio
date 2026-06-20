@@ -1,7 +1,13 @@
+// import icones
+
 import { LogOut, ChevronDown, ChevronUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaHome, FaFileAlt, FaClipboardList } from "react-icons/fa";
+import { FaHome, FaFileAlt } from "react-icons/fa";
+import { IoIosChatbubbles } from "react-icons/io";
+import { IoIosPaper } from "react-icons/io";
+import { FaPlus } from "react-icons/fa";
+
 import logo from "../assets/logo.png";
 
 const menuButtonClass = (active) =>
@@ -52,9 +58,10 @@ export default function Sidebar({ user, isFreelancer, onLogout }) {
 
               <button
                 type="button"
-                onClick={() => navigate("/applications")}
-                className={menuButtonClass(isActive("/applications"))}
+                onClick={() => navigate("/vagas-aplicadas")}
+                className={menuButtonClass(isActive("/vagas-aplicadas"))}
               >
+                <IoIosPaper />
                 Vagas Aplicadas
               </button>
             </>
@@ -64,6 +71,7 @@ export default function Sidebar({ user, isFreelancer, onLogout }) {
               onClick={() => setJobsOpen(!jobsOpen)}
               className={`${menuButtonClass(isActive("/jobs"))} flex items-center justify-between`}
             >
+
               <span>Vagas</span>
 
               {jobsOpen ? (
@@ -79,20 +87,29 @@ export default function Sidebar({ user, isFreelancer, onLogout }) {
 
               <button
                 onClick={() => navigate("/jobs")}
-                className={"w-full text-left p-2 rounded hover:bg-gray-200 text-white hover:text-black"}
+                className={"w-full text-left p-2 rounded hover:bg-gray-200 text-white hover:text-black flex gap-2 items-center"}
               >
+                <IoIosPaper />
                 Minhas vagas
               </button>
 
               <button
                 onClick={() => navigate("/jobs/create")}
-                className={"w-full text-left p-2 rounded hover:bg-gray-200 text-white hover:text-black"}
+                className={"w-full text-left p-2 rounded hover:bg-gray-200 text-white hover:text-black flex gap-2 items-center"}
               >
+                <FaPlus />
                 Nova vaga
               </button>
 
             </div>
           )}
+          <button
+            onClick={() => navigate("/chat")}
+            className={menuButtonClass(isActive("/chat"))}
+          >
+            <IoIosChatbubbles />
+            Chat
+          </button>
         </div>
       </div>
 
