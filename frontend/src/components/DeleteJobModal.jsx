@@ -6,6 +6,8 @@ export default function DeleteJobModal({
   onClose,
   onConfirm,
   isDeleting = false,
+  title,
+
 }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -14,7 +16,7 @@ export default function DeleteJobModal({
       </h2>
 
       <p className="text-gray-600 mb-6">
-        Tem certeza que deseja excluir a vaga
+        {title}
         <span className="font-semibold"> {job?.title}</span>?
       </p>
 

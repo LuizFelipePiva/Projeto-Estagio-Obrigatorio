@@ -82,6 +82,10 @@ export default function Jobs() {
     }
   };
 
+  const openCandidatesModal = () => {
+    console.log("teste")
+  }
+
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -91,6 +95,7 @@ export default function Jobs() {
             job={job}
             onEdit={openEditModal}
             onDelete={openDeleteModal}
+            onShowCandidates={openCandidatesModal}
           />
         ))}
       </div>
@@ -101,6 +106,7 @@ export default function Jobs() {
         onClose={closeDeleteModal}
         onConfirm={handleDelete}
         isDeleting={isDeleting}
+        title={"Tem certeza que deseja excluir a vaga"}
       />
 
       <EditJobModal

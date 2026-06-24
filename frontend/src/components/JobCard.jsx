@@ -15,31 +15,36 @@ export default function JobCard({
   onEdit,
   onDelete,
   onAction,
+  onRemoveAplication,
+  onShowCandidates,
   actionLabel = "Aplicar",
 }) {
 
   //var nome_pendencia = "";
   var classe_flag_pendencia = "";
+  var status = "";
 
-  if (job.flag_pendencia === "Pendente") {
-    //nome_pendencia = "Pendente";
-    classe_flag_pendencia = "bg-yellow-50";
+  if (job.flag_pendencia) {
+    const statusConfig = {
+      Pendente: {
+        card: "bg-yellow-100",
+        icon: "bg-yellow-400"
+      },
+      Aprovado: {
+        card: "bg-green-100",
+      },
+      Recusado: {
+        card: "bg-red-200",
+        icon: "bg-red-400"
+      }
+    }
+    status = statusConfig[job.flag_pendencia];
   }
 
-  else if (job.flag_pendencia === "Aprovado") {
-    //nome_pendencia = "Aprovado";
-    classe_flag_pendencia = "bg-green-50";
-
-  }
-
-  else if (job.flag_pendencia === "Recusado") {
-    //nome_pendencia = "Recusado";
-    classe_flag_pendencia = "bg-red-100";
-
-  }
+  console.log(job)
 
   return (
-    <div className={`bg-white rounded-2xl shadow-md border border-gray-200 p-5 hover:shadow-lg transition ${classe_flag_pendencia}`}>
+    <div className={`bg-white rounded-2xl shadow-md border border-gray-200 p-5 hover:shadow-lg transition ${status.card}`}>
       <div className="flex justify-between items-start gap-3 mb-3">
         <h3 className="text-lg font-semibold text-gray-800">{job.title}</h3>
 
@@ -50,7 +55,7 @@ export default function JobCard({
             </span>
           )}
           {job.flag_pendencia && (
-            <span className={`text-xs px-3 py-1 rounded-full shrink-0 items-end ${classe_flag_pendencia}`} >
+            <span className={`text-xs px-3 py-1 rounded-full shrink-0 items-end ${status.card, status.icon}`} >
               {job.flag_pendencia}
             </span>
           )}
@@ -84,7 +89,7 @@ export default function JobCard({
       </div>
 
 
-      {(onEdit || onDelete || onAction) && (
+      {(onEdit || onDelete || onAction || onRemoveAplication || onShowCandidates) && (
         <div className="mt-5 flex gap-2">
           {onEdit && (
             <button
@@ -113,6 +118,26 @@ export default function JobCard({
               onClick={() => onAction(job)}
             >
               {actionLabel}
+            </button>
+          )}
+
+          {onShowCandidates && (
+            <button
+            type="button"
+            className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+            onClick={() => onShowCandidates(job)}
+            >
+              Mostrar Candidatos
+            </button>
+          )}
+          
+          {onRemoveAplication && (
+            <button
+            type="button"
+            className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+            onClick={() => onRemoveAplication(job)}
+            >
+              Remover Candidatura
             </button>
           )}
         </div>
