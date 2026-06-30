@@ -82,7 +82,8 @@ function App() {
             <Route path="/vagas-aplicadas" element={<VagasAplicadas />} />
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/jobs/create" element={<CreateJob />} />
-            <Route path="/chat" element={<Chat />} />
+            <Route path="/chat" element= {<Chat />}/>
+            
           </Route>
         </Routes>
       </BrowserRouter>

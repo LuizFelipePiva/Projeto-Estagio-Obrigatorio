@@ -7,7 +7,10 @@ export default function DeleteJobModal({
   onConfirm,
   isDeleting = false,
   title,
-
+  btnName = {
+    name1: "Excluindo...",
+    name2: "Excluir",
+  },
 }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -36,7 +39,7 @@ export default function DeleteJobModal({
           disabled={isDeleting || !job}
           className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-70"
         >
-          {isDeleting ? "Excluindo..." : "Excluir"}
+          {isDeleting ? btnName.name1 : btnName.name2}
         </button>
       </div>
     </Modal>

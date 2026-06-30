@@ -7,6 +7,7 @@ import { deleteJob } from "../controllers/jobDelete.js";
 import { editJob } from "../controllers/jobEdit.js";
 import { allJobs } from "../controllers/allJobs.js";
 import { applyForJob } from "../controllers/aplicarVaga.js";
+import { getJobCandidates, updateJobCandidateStatus } from "../controllers/jobCandidates.js";
 
 // Importacao do middleware de autenticacao para proteger as rotas de criacao de vagas.
 import { authMiddleware } from "../middlewares/auth.js";
@@ -23,6 +24,14 @@ router.post("/createJob",
 router.get("/myJobs",
     authMiddleware,
     getMyJobs
+);
+
+router.get("/:id_vagas/candidates", authMiddleware, getJobCandidates);
+
+router.patch(
+    "/:id_vagas/candidates/:idvagas_aplicadas/status",
+    authMiddleware,
+    updateJobCandidateStatus
 );
 
 router.delete("/:id_vagas", authMiddleware, deleteJob);

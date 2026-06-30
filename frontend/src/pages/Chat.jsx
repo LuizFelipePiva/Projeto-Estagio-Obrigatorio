@@ -1,7 +1,332 @@
+import { useEffect, useState } from "react";
+import { useOutletContext, useSearchParams } from "react-router-dom";
+import {
+  BriefcaseBusiness,
+  MessageCircle,
+  MoreVertical,
+  Paperclip,
+  Search,
+  Send,
+} from "lucide-react";
+
+import api from "../services/api";
+
+const formatMessageTime = (date) => {
+  if (!date) return "";
+
+  return new Date(date).toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
 export default function Chat() {
+  const { user, isFreelancer } = useOutletContext();
+  const [searchParams] = useSearchParams();
+  const [conversations, setConversations] = useState([]);
+  const [activeConversationId, setActiveConversationId] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [search, setSearch] = useState("");
+  const [message, setMessage] = useState("");
+  const [isLoadingConversations, setIsLoadingConversations] = useState(false);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState("");
+
+  const activeConversation = conversations.find(
+    (conversation) => conversation.id_conversa === activeConversationId
+  );
+
+  const filteredConversations = conversations.filter((conversation) => {
+    const term = search.toLowerCase();
+    const name = conversation.other_user_name ?? "";
+    const jobTitle = conversation.job_title ?? "";
+
+    return (
+      name.toLowerCase().includes(term) ||
+      jobTitle.toLowerCase().includes(term)
+    );
+  });
+
+  useEffect(() => {
+    const loadConversations = async () => {
+      try {
+        setIsLoadingConversations(true);
+        setError("");
+
+        const response = await api.get("/chat/conversations");
+        setConversations(response.data);
+
+        const conversationFromUrl = Number(searchParams.get("conversation"));
+        const hasConversationFromUrl = response.data.some(
+          (conversation) => conversation.id_conversa === conversationFromUrl
+        );
+
+        if (response.data.length > 0) {
+          setActiveConversationId((currentId) =>
+            hasConversationFromUrl
+              ? conversationFromUrl
+              : currentId ?? response.data[0].id_conversa
+          );
+        }
+      } catch (err) {
+        setError(err.response?.data?.message || "Erro ao buscar conversas");
+      } finally {
+        setIsLoadingConversations(false);
+      }
+    };
+
+    loadConversations();
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!activeConversationId) {
+      setMessages([]);
+      return;
+    }
+
+    const loadMessages = async () => {
+      try {
+        setIsLoadingMessages(true);
+        setError("");
+
+        const response = await api.get(
+          `/chat/conversations/${activeConversationId}/messages`
+        );
+        setMessages(response.data);
+      } catch (err) {
+        setError(err.response?.data?.message || "Erro ao buscar mensagens");
+      } finally {
+        setIsLoadingMessages(false);
+      }
+    };
+
+    loadMessages();
+  }, [activeConversationId]);
+
+  const handleSelectConversation = (conversationId) => {
+    setActiveConversationId(conversationId);
+  };
+
+  const handleSendMessage = async (event) => {
+    event.preventDefault();
+
+    const trimmedMessage = message.trim();
+
+    if (!trimmedMessage || !activeConversation) return;
+
+    try {
+      setIsSending(true);
+      setError("");
+
+      const response = await api.post(
+        `/chat/conversations/${activeConversation.id_conversa}/messages`,
+        { conteudo: trimmedMessage }
+      );
+
+      setMessages((prev) => [...prev, response.data]);
+      setConversations((prev) =>
+        prev.map((conversation) =>
+          conversation.id_conversa === activeConversation.id_conversa
+            ? {
+                ...conversation,
+                last_message: response.data.conteudo,
+                last_message_created_at: response.data.created_at,
+              }
+            : conversation
+        )
+      );
+      setMessage("");
+    } catch (err) {
+      setError(err.response?.data?.message || "Erro ao enviar mensagem");
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   return (
-    <div>
-        Chat
+    <div className="h-full min-h-[620px] bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden grid grid-cols-1 lg:grid-cols-[340px_1fr]">
+      <aside className="border-r border-gray-200 bg-slate-50 flex flex-col min-h-[280px]">
+        <div className="p-5 border-b border-gray-200 bg-white">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Chat</h1>
+              <p className="text-sm text-gray-500 mt-1">
+                {isFreelancer
+                  ? "Converse com contratantes"
+                  : "Converse com candidatos"}
+              </p>
+            </div>
+
+            <span className="h-11 w-11 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+              <BriefcaseBusiness size={21} />
+            </span>
+          </div>
+
+          <div className="relative mt-5">
+            <Search
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+            <input
+              type="text"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Buscar conversa..."
+              className="w-full border border-gray-200 rounded-xl py-3 pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+            />
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-3 space-y-2">
+          {isLoadingConversations && (
+            <p className="text-sm text-gray-500 p-3">Carregando conversas...</p>
+          )}
+
+          {!isLoadingConversations && filteredConversations.length === 0 && (
+            <div className="p-6 text-center text-gray-500">
+              <MessageCircle className="mx-auto mb-3 text-gray-300" size={34} />
+              <p className="text-sm">Nenhuma conversa encontrada</p>
+            </div>
+          )}
+
+          {filteredConversations.map((conversation) => (
+            <button
+              key={conversation.id_conversa}
+              type="button"
+              onClick={() => handleSelectConversation(conversation.id_conversa)}
+              className={`w-full text-left p-4 rounded-xl transition border ${
+                conversation.id_conversa === activeConversationId
+                  ? "bg-white border-blue-200 shadow-sm"
+                  : "bg-transparent border-transparent hover:bg-white hover:border-gray-200"
+              }`}
+            >
+              <div className="min-w-0">
+                <p className="font-semibold text-gray-900 truncate">
+                  {conversation.other_user_name}
+                </p>
+                <p className="text-xs text-gray-500 truncate mt-1">
+                  {conversation.job_title || "Conversa"}
+                </p>
+              </div>
+
+              <p className="text-xs text-gray-500 truncate mt-3">
+                {conversation.last_message || "Nenhuma mensagem ainda"}
+              </p>
+            </button>
+          ))}
+        </div>
+      </aside>
+
+      <section className="flex flex-col min-h-[620px] bg-[#f7fbff]">
+        {activeConversation ? (
+          <>
+            <header className="h-20 px-5 border-b border-gray-200 bg-white flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <h2 className="text-lg font-semibold text-gray-900 truncate">
+                  {activeConversation.other_user_name}
+                </h2>
+                <p className="text-sm text-gray-500 truncate">
+                  {activeConversation.job_title || "Conversa"}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="h-10 w-10 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-500"
+                aria-label="Mais opcoes"
+              >
+                <MoreVertical size={20} />
+              </button>
+            </header>
+
+            {error && (
+              <div className="mx-5 mt-4 rounded-xl bg-red-50 text-red-600 px-4 py-3 text-sm">
+                {error}
+              </div>
+            )}
+
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              {isLoadingMessages && (
+                <p className="text-sm text-gray-500">Carregando mensagens...</p>
+              )}
+
+              {!isLoadingMessages && messages.length === 0 && (
+                <div className="h-full flex items-center justify-center text-center text-gray-500">
+                  <div>
+                    <MessageCircle className="mx-auto mb-3 text-gray-300" size={38} />
+                    <p>Nenhuma mensagem ainda.</p>
+                  </div>
+                </div>
+              )}
+
+              {messages.map((item) => {
+                const isMine = item.id_sender === user.id;
+
+                return (
+                  <div
+                    key={item.id_mensagem}
+                    className={`flex ${isMine ? "justify-end" : "justify-start"}`}
+                  >
+                    <div
+                      className={`max-w-[78%] rounded-2xl px-4 py-3 shadow-sm ${
+                        isMine
+                          ? "bg-blue-600 text-white rounded-br-md"
+                          : "bg-white text-gray-800 border border-gray-200 rounded-bl-md"
+                      }`}
+                    >
+                      <p className="text-sm leading-relaxed">{item.conteudo}</p>
+                      <p
+                        className={`text-[11px] mt-2 text-right ${
+                          isMine ? "text-blue-100" : "text-gray-400"
+                        }`}
+                      >
+                        {formatMessageTime(item.created_at)}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <form
+              onSubmit={handleSendMessage}
+              className="p-4 border-t border-gray-200 bg-white flex items-center gap-3"
+            >
+              
+
+              <input
+                type="text"
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+                placeholder="Digite sua mensagem..."
+                className="flex-1 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+
+              <button
+                type="submit"
+                className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                disabled={!message.trim() || isSending}
+              >
+                <Send size={18} />
+                {isSending ? "Enviando..." : "Enviar"}
+              </button>
+            </form>
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center p-6 text-center">
+            <div>
+              <MessageCircle className="mx-auto mb-3 text-gray-300" size={42} />
+              <h2 className="text-xl font-semibold text-gray-900">
+                Nenhuma conversa selecionada
+              </h2>
+              <p className="text-gray-500 mt-2">
+                Selecione uma conversa para comecar.
+              </p>
+            </div>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

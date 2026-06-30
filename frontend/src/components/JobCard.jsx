@@ -20,28 +20,25 @@ export default function JobCard({
   actionLabel = "Aplicar",
 }) {
 
-  //var nome_pendencia = "";
-  var classe_flag_pendencia = "";
-  var status = "";
-
-  if (job.flag_pendencia) {
-    const statusConfig = {
-      Pendente: {
-        card: "bg-yellow-100",
-        icon: "bg-yellow-400"
-      },
-      Aprovado: {
-        card: "bg-green-100",
-      },
-      Recusado: {
-        card: "bg-red-200",
-        icon: "bg-red-400"
-      }
+  const statusConfig = {
+    Pendente: {
+      card: "bg-[#FAFFC2]",
+      icon: "bg-[#E1D014]"
+    },
+    Aprovado: {
+      card: "bg-[#C6FAD3]",
+      icon: "bg-[#31ED60]"
+    },
+    Recusado: {
+      card: "bg-[#F9C9C8]",
+      icon: "bg-red-400"
     }
-    status = statusConfig[job.flag_pendencia];
-  }
+  };
 
-  console.log(job)
+  const status = statusConfig[job.flag_pendencia] ?? {
+    card: "",
+    icon: ""
+  };
 
   return (
     <div className={`bg-white rounded-2xl shadow-md border border-gray-200 p-5 hover:shadow-lg transition ${status.card}`}>
@@ -55,7 +52,7 @@ export default function JobCard({
             </span>
           )}
           {job.flag_pendencia && (
-            <span className={`text-xs px-3 py-1 rounded-full shrink-0 items-end ${status.card, status.icon}`} >
+            <span className={`text-xs px-3 py-1 rounded-full shrink-0 items-end ${status.icon}`} >
               {job.flag_pendencia}
             </span>
           )}
@@ -91,6 +88,17 @@ export default function JobCard({
 
       {(onEdit || onDelete || onAction || onRemoveAplication || onShowCandidates) && (
         <div className="mt-5 flex gap-2">
+
+          {onShowCandidates && (
+            <button
+              type="button"
+              className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+              onClick={() => onShowCandidates(job)}
+            >
+              Mostrar Candidatos
+            </button>
+          )}
+          
           {onEdit && (
             <button
               type="button"
@@ -121,21 +129,13 @@ export default function JobCard({
             </button>
           )}
 
-          {onShowCandidates && (
-            <button
-            type="button"
-            className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-            onClick={() => onShowCandidates(job)}
-            >
-              Mostrar Candidatos
-            </button>
-          )}
-          
+
+
           {onRemoveAplication && (
             <button
-            type="button"
-            className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-            onClick={() => onRemoveAplication(job)}
+              type="button"
+              className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+              onClick={() => onRemoveAplication(job)}
             >
               Remover Candidatura
             </button>

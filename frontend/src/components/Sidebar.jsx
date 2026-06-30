@@ -1,7 +1,7 @@
 // import icones
 
-import { LogOut, ChevronDown, ChevronUp } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaHome, FaFileAlt } from "react-icons/fa";
 import { IoIosChatbubbles } from "react-icons/io";
@@ -16,7 +16,7 @@ const menuButtonClass = (active) =>
     : "text-white hover:bg-white hover:text-black display flex items-center gap-2"
   }`;
 
-export default function Sidebar({ user, isFreelancer, onLogout }) {
+export default function Sidebar({ isFreelancer }) {
 
   const location = useLocation();
   const navigate = useNavigate();

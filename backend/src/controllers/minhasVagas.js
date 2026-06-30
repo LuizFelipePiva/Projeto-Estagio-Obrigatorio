@@ -11,7 +11,7 @@ export const minhasVagas = async (req, res) => {
             v.location,
             v.description,
             v.requirements,
-            va.flag_pendencia,
+            va.idvagas_aplicadas,
 
             CASE
 	            WHEN va.flag_pendencia = 0 THEN 'Recusado'

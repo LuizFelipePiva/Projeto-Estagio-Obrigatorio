@@ -6,6 +6,7 @@ import auth from './routes/auth.js';
 import jobs from './routes/jobs.js';
 import profile from './routes/profile.js';
 import vagas from './routes/vagas.js'; 
+import chat from './routes/chat.js';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use("/auth", auth);
 app.use("/jobs", jobs);
 app.use("/profile", profile);
 app.use("/vagas", vagas);
+app.use("/chat", chat);
 
 
 app.listen(process.env.PORT, () => {

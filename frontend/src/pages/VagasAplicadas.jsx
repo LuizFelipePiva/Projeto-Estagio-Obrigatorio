@@ -9,16 +9,17 @@ import RemoveJobModal from "../components/DeleteJobModal";
 export default function VagasAplicadas() {
 
   const [appliedJobs, setAppliedJobs] = useState([]);
-  const [isEditing, setIsEditing] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
   const [isRemoving, setIsRemoving] = useState(false);
 
   const [showRemoveModal, setShowRemoveModal] = useState(false);
 
+  const modalTitle = "Tem certeza que deseja remover a candidatura de";
+
   useEffect(() => {
     const fetchAppliedJobs = async () => {
       try {
-        const response = await api.get('/vagas/minhasVagas/:id_usuario');
+        const response = await api.get('/vagas/minhasVagas');
         setAppliedJobs(response.data);
       } catch (error) {
         console.error('Erro ao buscar vagas aplicadas:', error);
@@ -41,11 +42,18 @@ export default function VagasAplicadas() {
   const handleRemoveAplication = async () => {
     if (!selectedJob) return;
 
+    const applicationId = selectedJob.idvagas_aplicadas;
+
+    if (applicationId == null) {
+      console.error("Candidatura sem idvagas_aplicadas:", selectedJob);
+      return;
+    }
+
     try {
       setIsRemoving(true);
-      await api.delete(`/vagas/minhasVagas/removerCandidatura/${selectedJob.id_vagas}`);
-      setJobs((prev) =>
-        prev.filter((job) => job.id_vagas !== selectedJob.id_vagas)
+      await api.delete(`/vagas/minhasVagas/removerCandidatura/${applicationId}`);
+      setAppliedJobs((prev) =>
+        prev.filter((job) => job.idvagas_aplicadas !== applicationId)
       );
       closeRemoveModal();
     } catch (error) {
@@ -74,7 +82,11 @@ export default function VagasAplicadas() {
         onClose={closeRemoveModal}
         onConfirm={handleRemoveAplication}
         isDeleting={isRemoving}
-        title={"Tem certeza que deseja remover a candidatura de"}
+        title={modalTitle}
+        btnName={{
+          name1: "Removendo...",
+          name2: "Remover"
+        }}
       />
     </>
   );
