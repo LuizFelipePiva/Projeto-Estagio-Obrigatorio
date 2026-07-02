@@ -11,7 +11,10 @@ export const getMyJobs = async (req, res) => {
             location,
             data_final,
             description,
-            requirements
+            requirements,
+            usuario_selecionado,
+            COALESCE(flag_status, 0) AS flag_status,
+            nota_avaliacao
             FROM vagas WHERE id_user = ? `,
             [req.user.id]
         );

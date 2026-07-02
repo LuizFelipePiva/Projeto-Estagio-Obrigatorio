@@ -180,7 +180,7 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-white p-4 rounded-xl shadow">
-          <h2 className="font-semibold mb-4">Vagas disponiveis</h2>
+          <h2 className="font-semibold mb-4">Vagas disponíveis</h2>
 
           {filteredJobs.length === 0 ? (
             <p className="text-gray-500">Nenhuma vaga encontrada</p>

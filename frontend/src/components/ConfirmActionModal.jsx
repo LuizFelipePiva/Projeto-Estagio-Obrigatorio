@@ -8,7 +8,7 @@ const variantClasses = {
 
 export default function ConfirmActionModal({
   isOpen,
-  title = "Confirmar acao",
+  title = "Confirmar ação",
   message,
   subject,
   onClose,

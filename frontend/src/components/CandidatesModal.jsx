@@ -98,14 +98,25 @@ export default function CandidatesModal({
                   <div>
                     <span className="block text-gray-500">Telefone</span>
                     <span className="text-gray-800">
-                      {candidate.telefone || "Nao informado"}
+                      {candidate.telefone || "Não informado"}
                     </span>
                   </div>
 
                   <div>
                     <span className="block text-gray-500">Categoria</span>
                     <span className="text-gray-800">
-                      {candidate.category || "Nao informada"}
+                      {candidate.category || "Não informada"}
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="block text-gray-500">Média de avaliações</span>
+                    <span className="text-gray-800">
+                      {candidate.media_avaliações
+                        ? `${Number(candidate.media_avaliações).toLocaleString("pt-BR", {
+                            maximumFractionDigits: 1,
+                          })} / 5 (${candidate.total_avaliações})`
+                        : "Sem avaliações"}
                     </span>
                   </div>
                 </div>
@@ -121,7 +132,7 @@ export default function CandidatesModal({
 
                 {candidate.description && (
                   <div className="mt-3 text-xs">
-                    <span className="block text-gray-500">Descricao</span>
+                    <span className="block text-gray-500">Descrição</span>
                     <p className="text-gray-800 whitespace-pre-line line-clamp-2">
                       {candidate.description}
                     </p>

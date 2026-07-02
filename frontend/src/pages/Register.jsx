@@ -143,7 +143,7 @@ export default function Register() {
 
           <div className="mb-6 relative">
             <label className="block text-sm text-gray-600 mb-1">
-              Confirmar Senha
+              Confirmar senha
             </label>
 
             <input
@@ -170,7 +170,7 @@ export default function Register() {
           </button>
 
           <p className="text-sm text-gray-500 text-center mt-4">
-            Ja tem conta?{" "}
+            Já tem conta?{" "}
             <span
               onClick={() => navigate("/login")}
               className="text-blue-600 cursor-pointer"

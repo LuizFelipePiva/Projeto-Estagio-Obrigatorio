@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import api from "../services/api";
 import ConfirmActionModal from "../components/ConfirmActionModal";
+import CompleteJobModal from "../components/CompleteJobModal";
 import DeleteJobModal from "../components/DeleteJobModal";
 import EditJobModal from "../components/EditJobModal";
 import JobCard from "../components/JobCard";
@@ -26,6 +27,8 @@ export default function Jobs() {
   const [showRecuseCandidateModal, setShowRecuseCandidateModal] = useState(false);
   const [showAproveCandidateModal, setShowAproveCandidateModal] = useState(false);
   const [isUpdatingCandidate, setIsUpdatingCandidate] = useState(false);
+  const [showCompleteJobModal, setShowCompleteJobModal] = useState(false);
+  const [isCompletingJob, setIsCompletingJob] = useState(false);
 
   useEffect(() => {
     const getMyJobs = async () => {
@@ -213,9 +216,51 @@ export default function Jobs() {
         id_user_freelancer_conversa: candidate.user_id,
       });
 
-      navigate(`/chat?conversation=${response.data.id_conversa}`);
+      const conversationId = response.data?.id_conversa;
+
+      if (!conversationId) {
+        setCandidatesError("Não foi possível abrir o chat");
+        return;
+      }
+
+      navigate(`/chat?conversation=${conversationId}`);
     } catch (error) {
       setCandidatesError(error.response?.data?.message || "Erro ao abrir chat");
+    }
+  };
+
+  const openCompleteJobModal = (job) => {
+    setSelectedJob(job);
+    setShowCompleteJobModal(true);
+  };
+
+  const closeCompleteJobModal = () => {
+    setShowCompleteJobModal(false);
+    setSelectedJob(null);
+  };
+
+  const handleCompleteJob = async (rating) => {
+    if (!selectedJob) return;
+
+    try {
+      setIsCompletingJob(true);
+      await api.patch(`/jobs/${selectedJob.id_vagas}/complete`, {
+        nota_avaliacao: rating,
+      });
+
+      setJobs((prev) =>
+        prev.map((job) =>
+          job.id_vagas === selectedJob.id_vagas
+            ? { ...job, flag_status: 1, nota_avaliacao: rating }
+            : job
+        )
+      );
+
+      closeCompleteJobModal();
+    } catch (error) {
+      console.error("Erro ao concluir vaga:", error);
+    } finally {
+      setIsCompletingJob(false);
     }
   };
 
@@ -230,6 +275,11 @@ export default function Jobs() {
             onEdit={openEditModal}
             onDelete={openDeleteModal}
             onShowCandidates={openCandidatesModal}
+            onComplete={
+              job.usuario_selecionado && Number(job.flag_status) !== 1
+                ? openCompleteJobModal
+                : undefined
+            }
           />
         ))}
       </div>
@@ -242,7 +292,7 @@ export default function Jobs() {
         isDeleting={isDeleting}
         title={"Tem certeza que deseja excluir a vaga"}
         btnName={{
-          name1: "Exculindo...",
+          name1: "Excluindo...",
           name2: "Excluir"
         }}
       />
@@ -293,6 +343,14 @@ export default function Jobs() {
         confirmText="Aprovar"
         confirmDisabled={!selectedCandidate}
         variant="success"
+      />
+
+      <CompleteJobModal
+        isOpen={showCompleteJobModal}
+        job={selectedJob}
+        onClose={closeCompleteJobModal}
+        onConfirm={handleCompleteJob}
+        isLoading={isCompletingJob}
       />
     </>
   );

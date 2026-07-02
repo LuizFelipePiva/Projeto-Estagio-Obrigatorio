@@ -7,9 +7,11 @@ import {
   Paperclip,
   Search,
   Send,
+  Trash2,
 } from "lucide-react";
 
 import api from "../services/api";
+import ConfirmActionModal from "../components/ConfirmActionModal";
 
 const formatMessageTime = (date) => {
   if (!date) return "";
@@ -31,6 +33,9 @@ export default function Chat() {
   const [isLoadingConversations, setIsLoadingConversations] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [isDeletingConversation, setIsDeletingConversation] = useState(false);
+  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+  const [showDeleteChatModal, setShowDeleteChatModal] = useState(false);
   const [error, setError] = useState("");
 
   const activeConversation = conversations.find(
@@ -106,6 +111,7 @@ export default function Chat() {
 
   const handleSelectConversation = (conversationId) => {
     setActiveConversationId(conversationId);
+    setIsOptionsOpen(false);
   };
 
   const handleSendMessage = async (event) => {
@@ -141,6 +147,32 @@ export default function Chat() {
       setError(err.response?.data?.message || "Erro ao enviar mensagem");
     } finally {
       setIsSending(false);
+    }
+  };
+
+  const handleDeleteConversation = async () => {
+    if (!activeConversation) return;
+
+    try {
+      setIsDeletingConversation(true);
+      setError("");
+
+      await api.delete(`/chat/conversations/${activeConversation.id_conversa}`);
+
+      const nextConversations = conversations.filter(
+        (conversation) =>
+          conversation.id_conversa !== activeConversation.id_conversa
+      );
+
+      setConversations(nextConversations);
+      setActiveConversationId(nextConversations[0]?.id_conversa ?? null);
+      setMessages([]);
+      setIsOptionsOpen(false);
+      setShowDeleteChatModal(false);
+    } catch (err) {
+      setError(err.response?.data?.message || "Erro ao apagar chat");
+    } finally {
+      setIsDeletingConversation(false);
     }
   };
 
@@ -231,13 +263,33 @@ export default function Chat() {
                 </p>
               </div>
 
-              <button
-                type="button"
-                className="h-10 w-10 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-500"
-                aria-label="Mais opcoes"
-              >
-                <MoreVertical size={20} />
-              </button>
+              <div className="relative">
+                <button
+                  type="button"
+                  className="h-10 w-10 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-500"
+                  aria-label="Mais opções"
+                  onClick={() => setIsOptionsOpen((prev) => !prev)}
+                >
+                  <MoreVertical size={20} />
+                </button>
+
+                {isOptionsOpen && (
+                  <div className="absolute right-0 top-12 w-44 rounded-xl border border-gray-200 bg-white shadow-lg p-2 z-20">
+                    <button
+                      type="button"
+                      className="w-full px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-70"
+                      onClick={() => {
+                        setShowDeleteChatModal(true);
+                        setIsOptionsOpen(false);
+                      }}
+                      disabled={isDeletingConversation}
+                    >
+                      <Trash2 size={16} />
+                      {isDeletingConversation ? "Apagando..." : "Apagar chat"}
+                    </button>
+                  </div>
+                )}
+              </div>
             </header>
 
             {error && (
@@ -321,12 +373,26 @@ export default function Chat() {
                 Nenhuma conversa selecionada
               </h2>
               <p className="text-gray-500 mt-2">
-                Selecione uma conversa para comecar.
+                Selecione uma conversa para começar.
               </p>
             </div>
           </div>
         )}
       </section>
+
+      <ConfirmActionModal
+        isOpen={showDeleteChatModal}
+        title="Apagar chat"
+        message="Tem certeza que deseja apagar o chat com"
+        subject={activeConversation?.other_user_name}
+        onClose={() => setShowDeleteChatModal(false)}
+        onConfirm={handleDeleteConversation}
+        isLoading={isDeletingConversation}
+        loadingText="Apagando..."
+        confirmText="Apagar"
+        confirmDisabled={!activeConversation}
+        variant="danger"
+      />
     </div>
   );
 }

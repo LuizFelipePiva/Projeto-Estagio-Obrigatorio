@@ -9,8 +9,12 @@ export const minhasVagas = async (req, res) => {
             v.modality,
             v.salary,
             v.location,
+            v.data_final,
             v.description,
             v.requirements,
+            v.usuario_selecionado,
+            COALESCE(v.flag_status, 0) AS flag_status,
+            v.nota_avaliacao,
             va.idvagas_aplicadas,
 
             CASE

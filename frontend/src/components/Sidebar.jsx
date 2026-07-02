@@ -53,7 +53,7 @@ export default function Sidebar({ isFreelancer }) {
                 className={menuButtonClass(isActive("/curriculum"))}
               >
                 <FaFileAlt />
-                Curriculo
+                Currículo
               </button>
 
               <button
@@ -63,6 +63,15 @@ export default function Sidebar({ isFreelancer }) {
               >
                 <IoIosPaper />
                 Vagas Aplicadas
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate("/projetos-concluídos")}
+                className={menuButtonClass(isActive("/projetos-concluídos"))}
+              >
+                <IoIosPaper />
+                Projetos Concluídos
               </button>
             </>
           ) : (

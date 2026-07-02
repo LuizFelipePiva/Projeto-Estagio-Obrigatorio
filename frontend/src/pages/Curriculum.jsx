@@ -36,7 +36,7 @@ export default function Curriculum() {
           });
         }
       } catch (error) {
-        toast.error(error.response?.data?.message || "Erro ao carregar curriculo");
+        toast.error(error.response?.data?.message || "Erro ao carregar currículo");
       } finally {
         setIsLoading(false);
       }
@@ -61,12 +61,12 @@ export default function Curriculum() {
 
       setIsSubmitting(true);
       const response = await api.put("/profile/freelancer", formData);
-      toast.success(response.data?.message || "Curriculo salvo com sucesso");
+      toast.success(response.data?.message || "Currículo salvo com sucesso");
       navigate("/dashboard");
 
     } catch (error) {
 
-      toast.error(error.response?.data?.message || "Erro ao salvar curriculo");
+      toast.error(error.response?.data?.message || "Erro ao salvar currículo");
       navigate("/dashboard");
 
     } finally {
@@ -79,18 +79,18 @@ export default function Curriculum() {
   if (!isFreelancer) {
     return (
       <div className="bg-white rounded-xl shadow p-6">
-        <p className="text-gray-600">Curriculo disponivel apenas para freelancers.</p>
+        <p className="text-gray-600">Currículo disponível apenas para freelancers.</p>
       </div>
     );
   }
 
   if (isLoading) {
-    return <div className="p-6">Carregando curriculo...</div>;
+    return <div className="p-6">Carregando currículo...</div>;
   }
 
   return (
     <div className="bg-white rounded-xl shadow p-6 w-[95%] justify-self-center">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Meu curriculo</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Meu currículo</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -108,13 +108,13 @@ export default function Curriculum() {
             <option>Desenvolvimento</option>
             <option>Design</option>
             <option>Marketing</option>
-            <option>Redacao</option>
+            <option>Redação</option>
           </select>
         </div>
 
         <div>
           <label className="block mb-2 font-medium text-gray-700">
-            Descricao
+            Descrição
           </label>
           <textarea
             required
@@ -122,7 +122,7 @@ export default function Curriculum() {
             name="description"
             value={formData.description}
             onChange={handleChange}
-            placeholder="Conte um pouco sobre sua experiencia profissional..."
+            placeholder="Conte um pouco sobre sua experiência profissional..."
             className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -167,7 +167,7 @@ export default function Curriculum() {
             disabled={isSubmitting}
             className="px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition font-medium disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {isSubmitting ? "Salvando..." : "Salvar curriculo"}
+            {isSubmitting ? "Salvando..." : "Salvar currículo"}
           </button>
         </div>
       </form>

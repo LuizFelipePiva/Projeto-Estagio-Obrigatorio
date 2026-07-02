@@ -26,6 +26,20 @@ export const getJobCandidates = async (req, res) => {
               pf.descricao AS description,
               pf.habilidades AS habilities,
               pf.telefone,
+              (
+                SELECT ROUND(AVG(v_avaliadas.nota_avaliacao), 1)
+                FROM vagas v_avaliadas
+                WHERE v_avaliadas.usuario_selecionado = va.id_user_vagas_aplicadas
+                  AND COALESCE(v_avaliadas.flag_status, 0) = 1
+                  AND v_avaliadas.nota_avaliacao IS NOT NULL
+              ) AS media_avaliacoes,
+              (
+                SELECT COUNT(*)
+                FROM vagas v_avaliadas
+                WHERE v_avaliadas.usuario_selecionado = va.id_user_vagas_aplicadas
+                  AND COALESCE(v_avaliadas.flag_status, 0) = 1
+                  AND v_avaliadas.nota_avaliacao IS NOT NULL
+              ) AS total_avaliacoes,
               CASE
                 WHEN va.flag_pendencia = 0 THEN 'Recusado'
                 WHEN va.flag_pendencia = 1 THEN 'Pendente'

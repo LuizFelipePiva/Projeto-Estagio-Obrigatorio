@@ -11,8 +11,11 @@ export const allJobs = async (req, res) => {
             location,
             data_final,
             description,
-            requirements
-            FROM vagas`,
+            requirements,
+            COALESCE(flag_status, 0) AS flag_status,
+            nota_avaliacao
+            FROM vagas
+            WHERE COALESCE(flag_status, 0) = 0`,
         );
         return res.status(200).json(jobs);
     } catch (error) {

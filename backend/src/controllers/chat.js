@@ -110,62 +110,105 @@ export const getMessages = async (req, res) => {
 
 export const createConversation = async (req, res) => {
   const { id_user_freelancer_conversa, id_vaga_conversa } = req.body;
+  let connection;
 
   if (!id_vaga_conversa) {
     return res.status(400).json({ message: "Id da vaga nao informado" });
   }
 
   try {
-    const [jobs] = await db.query(
+    const jobId = Number(id_vaga_conversa);
+    const requestedFreelancerId =
+      id_user_freelancer_conversa == null
+        ? null
+        : Number(id_user_freelancer_conversa);
+
+    if (!Number.isInteger(jobId)) {
+      return res.status(400).json({ message: "Id da vaga invalido" });
+    }
+
+    if (
+      requestedFreelancerId !== null &&
+      !Number.isInteger(requestedFreelancerId)
+    ) {
+      return res.status(400).json({ message: "Id do freelancer invalido" });
+    }
+
+    connection = await db.getConnection();
+    await connection.beginTransaction();
+
+    const [jobs] = await connection.query(
       "SELECT id_vagas, id_user FROM vagas WHERE id_vagas = ? LIMIT 1",
-      [id_vaga_conversa]
+      [jobId]
     );
 
     if (jobs.length === 0) {
+      await connection.rollback();
       return res.status(404).json({ message: "Vaga nao encontrada" });
     }
 
-    const contractorId = jobs[0].id_user;
+    const contractorId = Number(jobs[0].id_user);
     const freelancerId =
-      req.user.user_type === 0 ? req.user.id : id_user_freelancer_conversa;
+      req.user.user_type === 0 ? Number(req.user.id) : requestedFreelancerId;
 
     if (!freelancerId) {
+      await connection.rollback();
       return res.status(400).json({ message: "Id do freelancer nao informado" });
     }
 
-    if (req.user.id !== contractorId && req.user.id !== Number(freelancerId)) {
+    if (Number(req.user.id) !== contractorId && Number(req.user.id) !== freelancerId) {
+      await connection.rollback();
       return res.status(403).json({ message: "Acesso negado" });
     }
 
-    const [existing] = await db.query(
+    const [existing] = await connection.query(
       `SELECT id_conversa
        FROM conversa
        WHERE id_user_contratante_conversa = ?
          AND id_user_freelancer_conversa = ?
          AND id_vaga_conversa = ?
-       LIMIT 1`,
-      [contractorId, freelancerId, id_vaga_conversa]
+       ORDER BY id_conversa ASC
+       LIMIT 1
+       FOR UPDATE`,
+      [contractorId, freelancerId, jobId]
     );
 
     if (existing.length > 0) {
-      return res.status(200).json({ id_conversa: existing[0].id_conversa });
+      await connection.commit();
+      return res.status(200).json({
+        id_conversa: existing[0].id_conversa,
+        reused: true,
+      });
     }
 
-    const [[next]] = await db.query(
+    const [[next]] = await connection.query(
       "SELECT COALESCE(MAX(id_conversa), 0) + 1 AS nextId FROM conversa"
     );
 
-    await db.query(
+    await connection.query(
       `INSERT INTO conversa
        (id_conversa, id_user_contratante_conversa, id_user_freelancer_conversa, id_vaga_conversa, created_at)
        VALUES (?, ?, ?, ?, NOW())`,
-      [next.nextId, contractorId, freelancerId, id_vaga_conversa]
+      [next.nextId, contractorId, freelancerId, jobId]
     );
 
-    return res.status(201).json({ id_conversa: next.nextId });
+    await connection.commit();
+
+    return res.status(201).json({
+      id_conversa: next.nextId,
+      reused: false,
+    });
   } catch (error) {
+    if (connection) {
+      await connection.rollback();
+    }
+
     console.error("Erro ao criar conversa:", error);
     return res.status(500).json({ message: "Erro ao criar conversa" });
+  } finally {
+    if (connection) {
+      connection.release();
+    }
   }
 };
 

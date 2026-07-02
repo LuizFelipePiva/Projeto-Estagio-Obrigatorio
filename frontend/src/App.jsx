@@ -12,6 +12,7 @@ import VagasAplicadas from "./pages/VagasAplicadas";
 import Jobs from "./pages/Jobs";
 import CreateJob from "./pages/CreateJob";
 import Chat from "./pages/Chat";
+import ProjetosConcluidos from "./pages/ProjetosConcluidos";
 
 // Component imports
 
@@ -80,6 +81,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/curriculum" element={<Curriculum />} />
             <Route path="/vagas-aplicadas" element={<VagasAplicadas />} />
+            <Route path="/projetos-concluidos" element={<ProjetosConcluidos />} />
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/jobs/create" element={<CreateJob />} />
             <Route path="/chat" element= {<Chat />}/>
