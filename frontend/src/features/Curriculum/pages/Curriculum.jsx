@@ -1,0 +1,176 @@
+import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
+import { toast } from "react-toastify";
+
+import { useNavigate } from "react-router-dom";
+
+import { PatternFormat } from "react-number-format";
+
+import api from "../../../services/api";
+
+const emptyProfile = {
+  category: "",
+  description: "",
+  habilities: "",
+  telefone: "",
+};
+
+export default function Curriculum() {
+  const { isFreelancer } = useOutletContext();
+  const [formData, setFormData] = useState(emptyProfile);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const response = await api.get("/profile/freelancer");
+
+        if (response.data) {
+          setFormData({
+            category: response.data.category ?? "",
+            description: response.data.description ?? "",
+            habilities: response.data.habilities ?? "",
+            telefone: response.data.telefone ?? "",
+          });
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Erro ao carregar currículo");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, []);
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+
+      setIsSubmitting(true);
+      const response = await api.put("/profile/freelancer", formData);
+      toast.success(response.data?.message || "Currículo salvo com sucesso");
+      navigate("/dashboard");
+
+    } catch (error) {
+
+      toast.error(error.response?.data?.message || "Erro ao salvar currículo");
+      navigate("/dashboard");
+
+    } finally {
+
+      setIsSubmitting(false);
+
+    }
+  };
+
+  if (!isFreelancer) {
+    return (
+      <div className="bg-white rounded-xl shadow p-6">
+        <p className="text-gray-600">Currículo disponível apenas para freelancers.</p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return <div className="p-6">Carregando currículo...</div>;
+  }
+
+  return (
+    <div className="bg-white rounded-xl shadow p-6 w-[95%] justify-self-center">
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Meu currículo</h1>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label className="block mb-2 font-medium text-gray-700">
+            Categoria
+          </label>
+          <select
+            required
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Selecione</option>
+            <option>Desenvolvimento</option>
+            <option>Design</option>
+            <option>Marketing</option>
+            <option>Redação</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block mb-2 font-medium text-gray-700">
+            Descrição
+          </label>
+          <textarea
+            required
+            rows="5"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            placeholder="Conte um pouco sobre sua experiência profissional..."
+            className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-2 font-medium text-gray-700">
+            Habilidades
+          </label>
+          <textarea
+            required
+            rows="4"
+            name="habilities"
+            value={formData.habilities}
+            onChange={handleChange}
+            placeholder="Ex: React, Node.js, Figma, copywriting..."
+            className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block mb-2 font-medium text-gray-700">
+            Telefone para contato
+          </label>
+
+          <PatternFormat
+            format="(##) #####-####"
+            value={formData.telefone}
+            onValueChange={(values) =>
+              setFormData((prev) => ({
+                ...prev,
+                telefone: values.formattedValue,
+              }))
+            }
+            className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="(99) 99999-9999"
+          />
+        </div>
+
+        <div className="flex justify-end pt-2">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition font-medium disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {isSubmitting ? "Salvando..." : "Salvar currículo"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}

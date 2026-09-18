@@ -2,11 +2,11 @@ import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 
-import auth from './routes/auth.js';
-import jobs from './routes/jobs.js';
-import profile from './routes/profile.js';
-import vagas from './routes/vagas.js'; 
-import chat from './routes/chat.js';
+import auth from './features/Auth/routes/auth.js';
+import jobs from './features/Jobs/routes/jobs.js';
+import profile from './features/Profile/routes/profile.js';
+import vagas from './features/AppliedJobs/routes/vagas.js';
+import chat from './features/Chat/routes/chat.js';
 
 dotenv.config();
 

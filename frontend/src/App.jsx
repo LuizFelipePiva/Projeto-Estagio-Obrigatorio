@@ -1,43 +1,19 @@
-
-
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-// Page imports
+import AppliedJobs from "./features/AppliedJobs/pages/AppliedJobs";
+import Chat from "./features/Chat/pages/Chat";
+import CreateJob from "./features/CreateJob/pages/CreateJob";
+import Curriculum from "./features/Curriculum/pages/Curriculum";
+import FinishedJobs from "./features/FinishedProjects/pages/FinishedJobs";
+import Jobs from "./features/Jobs/pages/Jobs";
+import Login from "./features/Login/pages/Login";
+import MainPage from "./features/MainPage/pages/MainPage";
+import Register from "./features/Register/pages/Register";
 
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Register from "./pages/Register";
-import Curriculum from "./pages/Curriculum";
-import VagasAplicadas from "./pages/VagasAplicadas";
-import Jobs from "./pages/Jobs";
-import CreateJob from "./pages/CreateJob";
-import Chat from "./pages/Chat";
-import ProjetosConcluidos from "./pages/ProjetosConcluidos";
-
-// Component imports
-
-import Notification from "./components/notification";
-import PrivateLayout from "./components/PrivateLayout";
-
-function PublicRoute({ children }) {
-  const token = localStorage.getItem("token");
-
-  if (token) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return children;
-}
-
-function PrivateRoute({ children }) {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return children;
-}
+import Notification from "./shared/components/Notification";
+import PrivateLayout from "./shared/components/PrivateLayout";
+import PrivateRoute from "./shared/components/PrivateRoute";
+import PublicRoute from "./shared/components/PublicRoute";
 
 function App() {
   return (
@@ -78,14 +54,13 @@ function App() {
               </PrivateRoute>
             }
           >
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<MainPage />} />
             <Route path="/curriculum" element={<Curriculum />} />
-            <Route path="/vagas-aplicadas" element={<VagasAplicadas />} />
-            <Route path="/projetos-concluidos" element={<ProjetosConcluidos />} />
+            <Route path="/vagas-aplicadas" element={<AppliedJobs />} />
+            <Route path="/projetos-concluidos" element={<FinishedJobs />} />
             <Route path="/jobs" element={<Jobs />} />
             <Route path="/jobs/create" element={<CreateJob />} />
-            <Route path="/chat" element= {<Chat />}/>
-            
+            <Route path="/chat" element={<Chat />} />
           </Route>
         </Routes>
       </BrowserRouter>

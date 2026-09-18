@@ -22,22 +22,67 @@ O projeto esta dividido em duas partes:
 +-- backend
 |   +-- src
 |   |   +-- app.js
-|   |   +-- config
-|   |   |   +-- db.js
-|   |   +-- controllers
-|   |   +-- middlewares
-|   |   +-- routes
+|   |   +-- features
+|   |   |   +-- AppliedJobs
+|   |   |   |   +-- controllers
+|   |   |   |   +-- routes
+|   |   |   +-- Auth
+|   |   |   |   +-- controllers
+|   |   |   |   +-- routes
+|   |   |   +-- Chat
+|   |   |   |   +-- controllers
+|   |   |   |   +-- routes
+|   |   |   +-- Jobs
+|   |   |   |   +-- controllers
+|   |   |   |   +-- routes
+|   |   |   +-- Profile
+|   |   |   |   +-- controllers
+|   |   |   |   +-- routes
+|   |   +-- shared
+|   |   |   +-- config
+|   |   |   |   +-- db.js
+|   |   |   +-- middlewares
+|   |   |   |   +-- auth.js
 |   +-- package.json
 +-- frontend
 |   +-- src
-|   |   +-- components
-|   |   +-- pages
+|   |   +-- features
+|   |   |   +-- AppliedJobs/pages
+|   |   |   +-- Chat/pages
+|   |   |   +-- CreateJob/pages
+|   |   |   +-- Curriculum/pages
+|   |   |   +-- FinishedProjects/pages
+|   |   |   +-- Jobs
+|   |   |   |   +-- components
+|   |   |   |   +-- pages
+|   |   |   +-- Login/pages
+|   |   |   +-- MainPage
+|   |   |   |   +-- components
+|   |   |   |   +-- pages
+|   |   |   +-- Register/pages
+|   |   +-- shared
+|   |   |   +-- components
 |   |   +-- services
 |   |   |   +-- api.js
 |   |   +-- App.jsx
 |   +-- package.json
 +-- readme.md
 ```
+
+No backend, cada funcionalidade fica em `backend/src/features/<Feature>`, com
+suas pastas `controllers` e `routes`: `Auth` (autenticacao), `Jobs` (vagas),
+`AppliedJobs` (candidaturas), `Profile` (perfil) e `Chat` (conversas).
+A conexao com o banco fica em `backend/src/shared/config/db.js`, e o middleware
+de autenticacao fica em `backend/src/shared/middlewares/auth.js`, pois sao
+usados por varias features. O arquivo `backend/src/app.js` registra as rotas
+e inicia o servidor. Os endpoints da API permanecem os mesmos.
+
+As paginas ficam em `frontend/src/features/<Feature>/pages`. Componentes usados
+somente por uma pagina ficam em `components` dentro da respectiva feature.
+Componentes usados por mais de uma pagina, incluindo o layout, a navegacao,
+os modais compartilhados e o formulario de vagas, ficam em
+`frontend/src/shared/components`. As rotas de acesso continuam definidas em
+`frontend/src/App.jsx`.
 
 ## Requisitos
 
